@@ -6,31 +6,36 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
 public static class Serialization {
-
-	public static string saveFolderName = "voxelGameSaves";
-
-	public static string SaveLocation(string worldName) {
+	
+	public static string saveFolderName = "voxelRPGSaves";
+	
+	public static string saveLocation (string worldName)
+	{
 		string saveLocation = saveFolderName + "/" + worldName + "/";
-
-		if (!Directory.Exists (saveLocation)) {
-			Directory.CreateDirectory (saveLocation);
+		
+		if (!Directory.Exists(saveLocation))
+		{
+			Directory.CreateDirectory(saveLocation);
 		}
-
+		
 		return saveLocation;
 	}
-
-	public static string FileName(WorldPos chunkLocation) {
+	
+	public static string fileName (WorldPos chunkLocation)
+	{
 		string fileName = chunkLocation.x + "," + chunkLocation.y + "," + chunkLocation.z + ".bin";
 		return fileName;
 	}
-
-	public static void SaveChunk(Chunk chunk) {
+	
+	public static void saveChunk (Chunk chunk)
+	{
 		Save save = new Save (chunk);
-		if (save.blocks.Count == 0)
+		if (save.blocks.Count == 0) {
 			return;
+		}
 
-		string saveFile = SaveLocation (chunk.world.worldName);
-		saveFile += FileName (chunk.pos);
+		string saveFile = saveLocation (chunk.world.worldName);
+		saveFile += fileName (chunk.pos);
 		
 		IFormatter formatter = new BinaryFormatter ();
 		Stream stream = new FileStream (saveFile, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -38,23 +43,27 @@ public static class Serialization {
 		stream.Close ();
 	}
 	
-	public static bool LoadChunk(Chunk chunk) {
-		string saveFile = SaveLocation (chunk.world.worldName);
-		saveFile += FileName (chunk.pos);
+	public static bool loadChunk (Chunk chunk)
+	{
+		string saveFile = saveLocation (chunk.world.worldName);
+		saveFile += fileName (chunk.pos);
 		
-		if (!File.Exists (saveFile))
+		if (!File.Exists (saveFile)) {
 			return false;
+		}
 		
 		IFormatter formatter = new BinaryFormatter ();
 		FileStream stream = new FileStream (saveFile, FileMode.Open);
-		
+
 		Save save = (Save)formatter.Deserialize (stream);
 
-		foreach (var block in save.blocks) {
+		foreach (var block in save.blocks) 
+		{
 			chunk.blocks [block.Key.x, block.Key.y, block.Key.z] = block.Value;
 		}
 
 		stream.Close ();
+		
 		return true;
 	}
 }

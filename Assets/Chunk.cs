@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using System.Threading;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
 
+
+[Serializable]
 public class Chunk : MonoBehaviour {
+
+	MeshFilter filter;
+	MeshCollider coll;
 
 	public Block[ , , ] blocks = new Block[chunkSize, chunkSize, chunkSize];
 	public static int chunkSize = 16;
 	public bool update = false;
-
-	MeshFilter filter;
-	MeshCollider coll;
 
 	public World world;
 	public WorldPos pos;
@@ -21,61 +25,83 @@ public class Chunk : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+	
 		filter = gameObject.GetComponent<MeshFilter> ();
 		coll = gameObject.GetComponent<MeshCollider> ();
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+	void Update()
+	{
 		if (update) {
 			update = false;
-			UpdateChunk ();
+			updateChunk ();
 		}
 	}
 
-	public void SetBlocksUnmodified() {
-		foreach (Block block in blocks) {
+	public void setBlocksUnmodified()
+	{
+		foreach (Block block in blocks) 
+		{
 			block.changed = false;
 		}
 	}
 
-	public Block GetBlock(int x, int y, int z) {
-		if(InRange(x) && InRange(y) && InRange(z))
-			return blocks [x, y, z];
-		return world.GetBlock (pos.x + x, pos.y + y, pos.z + z);
+	//Return block at specified 3 dimensional position
+	public Block getBlock (int x, int y, int z)
+	{
+		if (inRange(x) && inRange(y) && inRange(z))
+		{
+			return blocks[x, y, z];
+		}
+
+		return world.getBlock (pos.x + x, pos.y + y, pos.z + z);
 	}
 
-	public void SetBlock(int x, int y, int z, Block block) {
-		if (InRange (x) && InRange (y) && InRange (z)) {
-			blocks [x, y, z] = block;
-		} else {
-			world.SetBlock (pos.x + x, pos.y + y, pos.z + z, block);
+	public void setBlock (int x, int y, int z, Block block)
+	{
+		if (inRange(x) && inRange(y) && inRange(z))
+		{
+			blocks[x, y, z] = block;
+		}
+		else
+		{
+			world.setBlock (pos.x + x, pos.y + y, pos.z + z, block);
 		}
 	}
 
-	public static bool InRange(int index) {
-		if (index < 0 || index >= chunkSize)
+	public static bool inRange (int index)
+	{
+		if (index < 0 || index >= chunkSize) 
+		{
 			return false;
-		
+		}
+
 		return true;
 	}
 
-	void UpdateChunk() {
+	//Update the chunk based on its contents
+	void updateChunk()
+	{
 		rendered = true;
 		MeshData meshData = new MeshData ();
 
-		for (int x = 0; x < chunkSize; x++) {
-			for (int y = 0; y < chunkSize; y++) {
-				for (int z = 0; z < chunkSize; z++) {
-					meshData = blocks[x, y, z].Blockdata(this, x, y, z, meshData);
+		for (int x = 0; x < chunkSize; x++) 
+		{
+			for (int y = 0; y < chunkSize; y++) 
+			{
+				for (int z = 0; z < chunkSize; z++) 
+				{
+					meshData = blocks[x, y, z].blockData(this, x, y, z, meshData);
 				}
 			}
 		}
 
-		RenderMesh(meshData);
+		renderMesh (meshData);
 	}
 
-	void RenderMesh(MeshData meshData) {
+	//Sends the calculated mesh information to the mesh and collision components
+	void renderMesh(MeshData meshData) 
+	{
 		filter.mesh.Clear ();
 		filter.mesh.vertices = meshData.vertices.ToArray ();
 		filter.mesh.triangles = meshData.triangles.ToArray ();
@@ -91,5 +117,4 @@ public class Chunk : MonoBehaviour {
 
 		coll.sharedMesh = mesh;
 	}
-
 }

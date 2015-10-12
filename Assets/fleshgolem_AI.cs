@@ -1,21 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class fleshgolem_AI : MonoBehaviour {
 
+	//Enemy Object Variables
 	private GameObject player;
 	private CharacterController character;
 	private Transform tr;
 	private Vector3 chaseDir;
+	public fleshgolem_Spawner golemSpawner;
+	private gameObjectNamer golemSpawnerRef;
 
+	//Enemy Health System
+	private int maxHealth = 100;
+	private int curHealth = 100;
+	private float healthBarHeight = 0.2f;
+	public Image healthBar;
+
+	public GameObject enemyDamaged;
+	public GameObject enemyKilled;
+	public GameObject hitBox;
+
+	//Enemy Movement System
 	private bool jumping = false;
-
 	private float vSpeed = 0f;
 	private bool jump = false;
 	public float speed = 14f;
 	public float jumpSpeed = 10f;
 	public float gravity = 10;
 
+	//Enemy Attack System
 	private bool attackReady = true;
 	private bool scentReady = true;
 
@@ -29,6 +44,8 @@ public class fleshgolem_AI : MonoBehaviour {
 	void Update ()
 	{    
 		if (this.transform.position.y < -65) {
+			golemSpawner.removeFromList(golemSpawnerRef);
+			Instantiate(enemyKilled, hitBox.transform.position, enemyKilled.transform.rotation);
 			Destroy (this.gameObject);
 		}
 
@@ -126,6 +143,56 @@ public class fleshgolem_AI : MonoBehaviour {
 		} 
 	}
 
+	private void updateHealthBar () {
+		healthBar.rectTransform.sizeDelta = new Vector2 (curHealth * 0.02f, healthBarHeight);
+	}
+
+	public void takeDamage (int damageAmount) {
+		if (damageAmount < 0)
+			damageAmount *= -1;
+
+		if ((curHealth - damageAmount) <= 0) {
+			curHealth = 0;
+			golemSpawner.removeFromList(golemSpawnerRef);
+
+			Instantiate(enemyKilled, hitBox.transform.position, enemyKilled.transform.rotation);
+			Destroy (this.gameObject);
+		} 
+		else {
+			Instantiate(enemyDamaged, hitBox.transform.position, enemyKilled.transform.rotation);
+			curHealth = curHealth - damageAmount;
+		}
+		updateHealthBar ();
+	}
+	
+	public void addHealth (int healAmount) {
+		if (healAmount < 0) {
+			healAmount *= -1;
+		}
+
+		if ((curHealth + healAmount) > 100) {
+			curHealth = 100;
+		} else {
+			curHealth = curHealth + healAmount;
+		}
+	}
+
+	public void setCurHealth (int health) {
+		if (health < 0) {
+			health *= -1;
+		}
+
+		curHealth = health;
+	}
+
+	public int getCurHealth () {
+		return curHealth;
+	}
+
+	public void setGolemSpawnerRef (gameObjectNamer golem) {
+		golemSpawnerRef = golem;
+	}
+
 	IEnumerator attackCooldown() {
 		yield return new WaitForSeconds (2f);
 		attackReady = true;
@@ -137,7 +204,7 @@ public class fleshgolem_AI : MonoBehaviour {
 	}
 
 	IEnumerator followingPlayerScent() {
-		yield return new WaitForSeconds (5f);
+		yield return new WaitForSeconds (4f);
 		scentReady = false;
 		StartCoroutine (catchPlayerScentCooldown ());
 	}

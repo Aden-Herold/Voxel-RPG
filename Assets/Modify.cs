@@ -7,6 +7,8 @@ public class Modify : MonoBehaviour
 	Vector2 rot;
 	public Texture2D crosshairImage;
 
+	public GameObject blockParticles;
+
 	void Start () {
 		Cursor.visible = false;
 	}
@@ -18,8 +20,16 @@ public class Modify : MonoBehaviour
 			RaycastHit hit;
 			if (Physics.Raycast(transform.position, transform.forward,out hit, 5 ))
 			{
-				Terrain.setBlock(hit, new BlockAir());
+				if (hit.collider.gameObject.tag == "Enemy") {
+					hit.collider.gameObject.GetComponent<fleshgolem_AI>().takeDamage(20);
+				}
+				else{
+					Instantiate(blockParticles, hit.point, blockParticles.transform.rotation);
+					Terrain.setBlock(hit, new BlockAir());
+				}
 			}
+
+			Debug.DrawRay(transform.position, transform.forward, Color.red);
 		}
 		
 		rot= new Vector2(

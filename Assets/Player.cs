@@ -19,20 +19,7 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	}
-
-	public void takeDamage (int damageAmount) {
-		if ((curHealth - damageAmount) < 0) {
-			curHealth = 0;
-		} else {
-			curHealth = curHealth - damageAmount;
-		}
-		updateHealthBar ();
-	}
-
-	public int getCurHealth () {
-		return curHealth;
-	}
-
+	
 	private void updateHealthBar () {
 		healthBarText.text = curHealth + " / " + maxHealth;
 		healthBar.rectTransform.sizeDelta = new Vector2 (curHealth * 3, healthBarHeight);
@@ -52,5 +39,26 @@ public class Player : MonoBehaviour {
 			healthBar.color = new Color32 (223, 68, 68, 166);
 			healthBarText.color = new Color32 (223, 68, 68, 255);
 		}
+	}
+
+	public void takeDamage (int damageAmount) {
+		if ((curHealth - damageAmount) < 0) {
+			curHealth = 0;
+		} else {
+			curHealth = curHealth - damageAmount;
+		}
+		updateHealthBar ();
+	}
+
+	public void addHealth (int healAmount) {
+		if ((curHealth + healAmount) > 100) {
+			curHealth = 100;
+		} else {
+			curHealth = curHealth + healAmount;
+		}
+	}
+	
+	public int getCurHealth () {
+		return curHealth;
 	}
 }

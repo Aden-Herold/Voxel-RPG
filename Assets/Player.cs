@@ -55,6 +55,10 @@ public class Player : MonoBehaviour {
 	}
 
 	public void addHealth (int healAmount) {
+		if (healAmount < 0) {
+			healAmount *= -1;
+		}
+
 		if ((curHealth + healAmount) > 100) {
 			curHealth = 100;
 		} else {
@@ -63,6 +67,10 @@ public class Player : MonoBehaviour {
 	}
 
 	public void setCurHealth (int health) {
+		if (health < 0) {
+			health *= -1;
+		}
+
 		curHealth = health;
 	}
 

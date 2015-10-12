@@ -42,6 +42,10 @@ public class Player : MonoBehaviour {
 	}
 
 	public void takeDamage (int damageAmount) {
+		if (damageAmount < 0) {
+			damageAmount *= -1;
+		}
+
 		if ((curHealth - damageAmount) < 0) {
 			curHealth = 0;
 		} else {
@@ -57,7 +61,11 @@ public class Player : MonoBehaviour {
 			curHealth = curHealth + healAmount;
 		}
 	}
-	
+
+	public void setCurHealth (int health) {
+		curHealth = health;
+	}
+
 	public int getCurHealth () {
 		return curHealth;
 	}

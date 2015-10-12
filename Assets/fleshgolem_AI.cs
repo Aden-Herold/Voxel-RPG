@@ -148,6 +148,9 @@ public class fleshgolem_AI : MonoBehaviour {
 	}
 
 	public void takeDamage (int damageAmount) {
+		if (damageAmount < 0)
+			damageAmount *= -1;
+
 		if ((curHealth - damageAmount) <= 0) {
 			curHealth = 0;
 			golemSpawner.removeFromList(golemSpawnerRef);
@@ -168,6 +171,14 @@ public class fleshgolem_AI : MonoBehaviour {
 		} else {
 			curHealth = curHealth + healAmount;
 		}
+	}
+
+	public void setCurHealth (int health) {
+		curHealth = health;
+	}
+
+	public int getCurHealth () {
+		return curHealth;
 	}
 
 	public void setGolemSpawnerRef (gameObjectNamer golem) {
